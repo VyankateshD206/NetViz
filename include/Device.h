@@ -3,15 +3,22 @@
 
 #include<string>
 
+enum Device_Types{NONE,SWITCH,BRIDGE,ROUTER,END_POINT};
+
 class device{
     public:
-        std::string type;
+        Device_Types type;
         std::string ip;
+        std::string mac;
 
         //default constructor
-        device(){
-            
-        }
+        device(Device_Types type,std::string ip,std::string mac);
+        //copy constructor
+        device(device *dev);
+        //assignment operator overloading
+        device operator=(device *d);
+        //destructor
+        ~device();
 };
 
 #endif
