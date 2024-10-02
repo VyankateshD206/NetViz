@@ -1,4 +1,4 @@
-#include "../include/Device.h"
+#include "Device.h"
 using namespace std;
 
 device::device(Device_Types type,string ip,string mac){
