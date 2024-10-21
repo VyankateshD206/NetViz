@@ -1,7 +1,7 @@
 #include <iostream>
 #include "Network.h"
 #include "Device.h"
-#include "AStar.h"
+#include "a-star.h"
 
 using namespace std;
 

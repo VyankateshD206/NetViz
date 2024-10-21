@@ -31,11 +31,8 @@ class Network{
 
         // Optional: Method to clear the network
         void clearNetwork();
-<<<<<<< HEAD
-    const std::vector<device>& getDevices() const { return devices; }
-    const std::unordered_map<std::string, std::vector<std::string>>& getConnections() const { return connections; }
-=======
->>>>>>> b9d6bb47b242fdb46930990aba2b2d27ac34d8fc
+        const std::vector<device>& getDevices() const { return devices; }
+        const std::unordered_map<std::string, std::vector<std::string>>& getConnections() const { return connections; }
 
 };
 
