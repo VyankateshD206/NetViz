@@ -1,9 +1,9 @@
-#include"Network.h"
+#include "Network.h"
 
 Network::Network() = default;
 
-void Network::addDevice(Device_Types type,const std::string &ip,const std::string &mac){
-    devices.emplace_back(type,ip,mac);
+void Network::addDevice(Device_Types type, const std::string &publicIp, const std::string &privateIp, const std::string &mac) {
+    devices.emplace_back(type, publicIp, privateIp, mac); // Include both IPs
     connections[mac];
 }
 
@@ -41,7 +41,7 @@ void Network::displayDevices() const {
 
     std::cout << "Devices in the network:" << std::endl;
     for (const auto &dev : devices) {
-        std::cout << "Type: " << dev.type << ", IP: " << dev.ip << ", MAC: " << dev.mac << std::endl;
+        std::cout << "Type: " << dev.type << ", Public IP: " << dev.publicIp << ", Private IP: " << dev.privateIp << ", MAC: " << dev.mac << std::endl;
     }
 }
 
