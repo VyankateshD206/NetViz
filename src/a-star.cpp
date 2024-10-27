@@ -2,7 +2,7 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
-#include <algorithm> // Include this for std::reverse
+#include <algorithm>
 #include "Device.h"
 #include "Network.h"
 
@@ -47,7 +47,7 @@ public:
                 device* step = goal;
                 while (step != nullptr) {
                     path.push_back(step);
-                    step = cameFrom[step->mac];
+                    step = cameFrom[step->mac]; // Check if the key exists before dereferencing
                 }
                 reverse(path.begin(), path.end());
                 return path;
@@ -70,7 +70,7 @@ public:
     }
 
     // Heuristic function (fixed for simplicity)
-    double heuristic(device* a, device* b) {
+    double heuristic(device* a, device* b) const { // Make const if it doesn't modify class state
         return 1.0; // Replace with actual heuristic logic if needed
     }
 
@@ -78,9 +78,10 @@ public:
     device* findDeviceByMac(const string& mac) {
         for (const auto& dev : network.getDevices()) {
             if (dev.mac == mac) {
-                return new device(dev); // Return a new device object
+                return &dev; // Return reference to the existing device
             }
         }
         return nullptr; // Device not found
     }
 };
+

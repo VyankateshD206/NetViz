@@ -1,41 +1,20 @@
 #include "Packet.h"
-using namespace std;
 
-// constructor
-DataPacket::DataPacket(const std::string &sa,const std::string &da,const std::string &d,const NetIdentifier &id){
-    if(id == SAME_NETWORK){
-        this->dstMac = da;
-        this->srcMac = sa;
-        this->dstIP = "NULL";
-        this->srcIP = "NULL";
-    }
-    else if(id == NOT_SAME_NETWORK){
-        this->dstIP = da;
-        this->srcIP = sa;
-        this->dstMac = "NULL";
-        this->srcMac = "NULL";
-    }
-
-    this->dataBuff = d;
-    this->identifier = id;
+//constructor
+Packet::Packet(std::string source_ip, std::string destination_ip, int source_port,int destination_port){
+    this->source_ip = source_ip;
+    this->destination_ip = destination_ip;
+    this->source_port = source_port;
+    this->destination_port = destination_port;
 }
 
-// copy constructor
-DataPacket::DataPacket(const DataPacket &p){
-    this->identifier = p.identifier;
-    this->dataBuff = p.dataBuff;
-    this->dstMac = p.dstMac;
-    this->dstIP = p.dstIP;
-    this->srcMac = p.srcMac;
-    this->srcIP = p.srcIP;
+
+//display packet info
+void Packet::display_packet_info() const{
+    std::cout << "Source IP: " << source_ip << std::endl;
+    std::cout << "Destination IP: " << destination_ip << std::endl;
+    std::cout << "Source Port: " << source_port << std::endl;
+    std::cout << "Destination Port: " << destination_port << std::endl;
+    std::cout << "Protocol: " << protocol << std::endl;
+    std::cout << "Data: " << data << std::endl;
 }
-
-// method to read packet data
-void DataPacket::ReadPacket() const{
-    if(this->identifier == NOT_SAME_NETWORK)
-        std::cout<<"Packet from "<<this->srcIP<<" To "<<this->dstIP<<" Containing Data "<<this->dataBuff;
-
-    else if(this->identifier == SAME_NETWORK)
-        std::cout<<"Packet from "<<this->srcMac<<" To "<<this->dstMac<<" Containing Data "<<this->dataBuff;
-}
-
