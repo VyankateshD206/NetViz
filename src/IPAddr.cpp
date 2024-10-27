@@ -1,22 +1,26 @@
 #include "IPAddr.h"
+#include <random>
+#include <sstream>
+#include <stdexcept>
+
 using namespace std;
 
-// method to split ip's into it's octets
-vector<int> IP::splitIP(const string& ip) const{
-    std::vector<int> octets;
-    std::stringstream ss(ip);
-    std::string oct;
+// Split IPs into octets
+vector<int> IP::splitIP(const string& ip) const {
+    vector<int> octets;
+    stringstream ss(ip);
+    string oct;
 
-    while(std::getline(ss,oct,'.')){
-        octets.push_back(std::stoi(oct));
+    while (getline(ss, oct, '.')) {
+        octets.push_back(stoi(oct));
     }
 
     return octets;
 }
 
 // Calculate the IP range based on network and subnet mask
-std::pair<std::vector<int>, std::vector<int>> IP::calculateRange(const std::vector<int>& network, const std::vector<int>& mask) const {
-    std::vector<int> startIP(4), endIP(4);
+pair<vector<int>, vector<int>> IP::calculateRange(const vector<int>& network, const vector<int>& mask) const {
+    vector<int> startIP(4), endIP(4);
     for (int i = 0; i < 4; ++i) {
         startIP[i] = network[i] & mask[i];
         endIP[i] = startIP[i] | (~mask[i] & 255);
@@ -25,8 +29,8 @@ std::pair<std::vector<int>, std::vector<int>> IP::calculateRange(const std::vect
 }
 
 // Convert vector of octets to string format IP address
-std::string IP::vectorToIP(const std::vector<int>& octets) const {
-    std::stringstream ss;
+string IP::vectorToIP(const vector<int>& octets) const {
+    stringstream ss;
     for (size_t i = 0; i < octets.size(); ++i) {
         ss << octets[i];
         if (i < octets.size() - 1) ss << ".";
@@ -35,55 +39,53 @@ std::string IP::vectorToIP(const std::vector<int>& octets) const {
 }
 
 // Generate a random IP within the specified range
-std::string IP::generateRandomIPInRange(const std::vector<int>& startIP, const std::vector<int>& endIP) const {
-    std::random_device rd;
-    std::mt19937 gen(rd());
-    std::vector<int> randomIP(4);
+string IP::generateRandomIPInRange(const vector<int>& startIP, const vector<int>& endIP) const {
+    random_device rd;
+    mt19937 gen(rd());
+    vector<int> randomIP(4);
     for (int i = 0; i < 4; ++i) {
-        std::uniform_int_distribution<> dis(startIP[i], endIP[i]);
+        uniform_int_distribution<> dis(startIP[i], endIP[i]);
         randomIP[i] = dis(gen);
     }
     return vectorToIP(randomIP);
 }
 
 // Generate a unique local IP based on network and subnet mask
-std::string IP::generateUniqueLocalIP(const std::string& networkAddress, const std::string& subnetMask) {
-    std::vector<int> network = splitIP(networkAddress);
-    std::vector<int> mask = splitIP(subnetMask);
+string IP::generateUniqueLocalIP(const string& networkAddress, const string& subnetMask) {
+    vector<int> network = splitIP(networkAddress);
+    vector<int> mask = splitIP(subnetMask);
     auto [startIP, endIP] = calculateRange(network, mask);
 
-    std::string ip;
+    string ip;
     do {
         ip = generateRandomIPInRange(startIP, endIP);
-    } while (localIPs.count(ip) > 0);  // Ensure uniqueness within local IPs
+    } while (localIPs.count(ip) > 0); // Ensure uniqueness within local IPs
 
-    localIPs.insert(ip);  // Add IP to local set
+    localIPs.insert(ip); // Add IP to local set
     return ip;
 }
 
 // Generate a unique public IP (ignoring subnet mask)
-std::string IP::generateUniquePublicIP() {
-    // Define a reasonable public IP range, e.g., "100.0.0.0" to "200.255.255.255"
-    std::vector<int> startIP = {100, 0, 0, 0};
-    std::vector<int> endIP = {200, 255, 255, 255};
+string IP::generateUniquePublicIP() {
+    vector<int> startIP = {100, 0, 0, 0};
+    vector<int> endIP = {200, 255, 255, 255};
 
-    std::string ip;
+    string ip;
     do {
         ip = generateRandomIPInRange(startIP, endIP);
-    } while (publicIPs.count(ip) > 0);  // Ensure uniqueness within public IPs
+    } while (publicIPs.count(ip) > 0); // Ensure uniqueness within public IPs
 
-    publicIPs.insert(ip);  // Add IP to public set
+    publicIPs.insert(ip); // Add IP to public set
     return ip;
 }
 
 // Generate a unique IP, distinguishing between local and public
-std::string IP::generateUniqueIP(const std::string& networkType, const std::string& networkAddress = "", const std::string& subnetMask = "") {
+string IP::generateUniqueIP(const string& networkType, const string& networkAddress = "", const string& subnetMask = "") {
     if (networkType == "local") {
         return generateUniqueLocalIP(networkAddress, subnetMask);
     } else if (networkType == "public") {
         return generateUniquePublicIP();
     } else {
-        throw std::invalid_argument("Invalid network type. Choose 'local' or 'public'.");
+        throw invalid_argument("Invalid network type. Choose 'local' or 'public'.");
     }
 }
-

@@ -2,6 +2,7 @@
 #include "Network.h"
 #include "Device.h"
 #include "a-star.h"
+#include "IPAddr.h" // Include the IPAddr class header if needed
 
 using namespace std;
 
@@ -23,8 +24,9 @@ int main() {
     // Display connections
     myNetwork.displayConnections();
 
-    // A* algorithm instance
+    // A* algorithm instance with access to the network
     AStarAlgorithm aStar;
+    aStar.network = myNetwork; // Ensure network is accessible in AStarAlgorithm
 
     // Finding path from SWITCH to END_POINT
     device* startDevice = aStar.findDeviceByMac("00:1A:2B:3C:4D:5E");
@@ -35,8 +37,11 @@ int main() {
 
         // Output the path
         cout << "Path from " << startDevice->mac << " to " << goalDevice->mac << ": ";
-        for (const auto& dev : path) {
-            cout << dev->mac << " ";
+        for (size_t i = 0; i < path.size(); ++i) {
+            cout << path[i]->mac;
+            if (i < path.size() - 1) {
+                cout << " -> "; // Use an arrow to indicate path direction
+            }
         }
         cout << endl;
     } else {
@@ -52,9 +57,11 @@ int main() {
 
     // Display devices after removal
     myNetwork.displayDevices();
+    
     // Display connections after removal
     myNetwork.displayConnections();
 
     return 0;
 }
+
 

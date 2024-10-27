@@ -1,25 +1,38 @@
 #include "Device.h"
+
 using namespace std;
 
-device::device(Device_Types type,string ip,string mac){
+// Constructor for device, accepts both public and private IPs
+device::device(Device_Types type, const string &publicIp, const string &privateIp, const string &mac) {
     this->type = type;
-    this->ip = ip;
-    this->mac = mac;
+    this->publicIp = publicIp;   // Store public IP
+    this->privateIp = privateIp;  // Store private IP
+    this->mac = mac;              // Store MAC address
 }
 
-device::device(const device* dev){
+// Copy constructor
+device::device(const device* dev) {
     this->type = dev->type;
-    this->ip = dev->type;
+    this->publicIp = dev->publicIp;   // Correctly copy public IP
+    this->privateIp = dev->privateIp; // Correctly copy private IP
     this->mac = dev->mac;
 }
 
-device device::operator=(const device *d){
-    device mydev = device(d->type,d->ip,d->mac);
-    return mydev;
+// Assignment operator
+device& device::operator=(const device *d) {
+    if (this != d) { // Avoid self-assignment
+        this->type = d->type;
+        this->publicIp = d->publicIp;    // Assign public IP
+        this->privateIp = d->privateIp;  // Assign private IP
+        this->mac = d->mac;
+    }
+    return *this;
 }
 
-device::~device(){
+// Destructor
+device::~device() {
     this->type = NONE;
-    this->ip = "";
-    this->mac = "";
+    this->publicIp = "";   // Clear public IP
+    this->privateIp = "";  // Clear private IP
+    this->mac = "";        // Clear MAC address
 }
