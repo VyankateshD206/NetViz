@@ -1,20 +1,38 @@
 #include "Packet.h"
 
+using namespace std;
+
 //constructor
-Packet::Packet(std::string source_ip, std::string destination_ip, int source_port,int destination_port){
-    this->source_ip = source_ip;
-    this->destination_ip = destination_ip;
-    this->source_port = source_port;
-    this->destination_port = destination_port;
+Packet::Packet(string &sIP,string &dIP,stirng &content,int id,int tl,int sp,int dp):
+source_ip(sIP),destination_ip(dIP),packetID(id),fragmentID(0),ttl(tl),source_port(sp),destination_port(dp),data(content){
+	priority = data.size()>20?2:1; // smaller data packets are given higher priority
+	checkSum = calculatecheckSum(data);	
+}
+
+// method to calculate the checkSum
+int Packet::calculatecheckSum(const string &data){
+	int sum = 0;
+	for(char c:data) sum+= c;
+	return sum%256;
 }
 
 
 //display packet info
 void Packet::display_packet_info() const{
-    std::cout << "Source IP: " << source_ip << std::endl;
-    std::cout << "Destination IP: " << destination_ip << std::endl;
-    std::cout << "Source Port: " << source_port << std::endl;
-    std::cout << "Destination Port: " << destination_port << std::endl;
-    std::cout << "Protocol: " << protocol << std::endl;
-    std::cout << "Data: " << data << std::endl;
+    cout<<"-----PACKET_INFO-----"<<endl;
+    cout<<"[+] PACKET-ID: "<<packetID<<endl;
+    cout<<"[+] FRAGMENT-ID: "<<fragmentID<<endl;
+    cout<<"[+] TIME-TO-LIVE: "<<ttl<<endl;
+    cout<<"[+] PRIORITY: "<<priority<<endl;
+    cout<<"[+] CHECKSUM: "<<checkSum<<endl;
+    cout<<"[+] DATA: "<<data<<endl;
+
+    cout<<"-----SOURCE-INFO-----"<<endl;
+    cout<<"[+] SOURCE-IP: "<<source_ip<<endl;
+    cout<<"[+] SOURCE-PORT: "<<source_port<<endl;
+    
+
+    cout<<"-----DESTINATION-INFO-----"<<endl;
+    cout<<"[+] DESTINATION-IP: "<<destination_ip<<endl;
+    cout<<"[+] DESTINATION-PORT: "<<destination_port<<endl;
 }
