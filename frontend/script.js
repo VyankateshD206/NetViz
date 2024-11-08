@@ -216,6 +216,33 @@ function renderGraph(data) {
             .duration(750)
             .call(zoom.transform, d3.zoomIdentity.scale(D3Config.zoom.defaultScale));
     });
+
+    // Add context menu to nodes
+    node.on('contextmenu', (event, d) => {
+        showContextMenu(d, event);
+    });
+
+    // Update node click handling
+    node.on('click', (event, d) => {
+        if (isLinkMode) {
+            if (selectedNode === null) {
+                // First node selection
+                selectedNode = d;
+                d3.select(event.currentTarget)
+                    .select('circle')
+                    .style('stroke', '#0d6efd')
+                    .style('stroke-width', '3px');
+            } else if (selectedNode.id !== d.id) {
+                // Second node selection - create link
+                addNewEdge(selectedNode.id, d.id);
+                // Reset selection
+                d3.selectAll('circle')
+                    .style('stroke', '#fff')
+                    .style('stroke-width', '2px');
+                selectedNode = null;
+            }
+        }
+    });
 }
 
 function createTooltipText(d) {
@@ -233,10 +260,9 @@ function createTooltipText(d) {
 }
 
 async function main() {
+    initializeModeSelector();
     const data = await fetchNetworkData();
-    console.log('Received data:', data);
     if (data && data.nodes && data.edges) {
-        console.log('Data received in main:', data);
         renderGraph(data);
         
         // Add window resize handler with debounce
@@ -254,3 +280,160 @@ async function main() {
 
 // Start the application
 main();
+
+async function addNewNode(deviceType, x, y) {
+    try {
+        const response = await fetch('http://localhost:9080/api/nodes', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                device_type: deviceType,
+                position: {
+                    x: x || window.innerWidth/2,
+                    y: y || window.innerHeight/2
+                }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add node');
+        }
+
+        const result = await response.json();
+        // Refresh the network data
+        const data = await fetchNetworkData();
+        renderGraph(data);
+        return result.id;
+    } catch (error) {
+        console.error('Error adding node:', error);
+        showError('Failed to add node');
+        return null;
+    }
+}
+
+async function addNewEdge(sourceId, targetId) {
+    try {
+        const response = await fetch('http://localhost:9080/api/edges', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                source: sourceId,
+                target: targetId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to add edge');
+        }
+
+        // Refresh the network data
+        const data = await fetchNetworkData();
+        renderGraph(data);
+    } catch (error) {
+        console.error('Error adding edge:', error);
+        showError('Failed to add edge');
+    }
+}
+
+async function deleteNode(nodeId) {
+    try {
+        const response = await fetch(`http://localhost:9080/api/nodes/${nodeId}`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete node');
+        }
+
+        // Refresh the network data
+        const data = await fetchNetworkData();
+        renderGraph(data);
+    } catch (error) {
+        console.error('Error deleting node:', error);
+        showError('Failed to delete node');
+    }
+}
+
+// Add context menu functionality
+function showContextMenu(d, event) {
+    event.preventDefault();
+    
+    // Remove any existing context menu
+    d3.select('.context-menu').remove();
+    
+    const contextMenu = d3.select('body')
+        .append('div')
+        .attr('class', 'context-menu')
+        .style('left', `${event.pageX}px`)
+        .style('top', `${event.pageY}px`);
+    
+    // Add menu items
+    contextMenu.append('div')
+        .text('Delete Node')
+        .on('click', () => {
+            deleteNode(d.id);
+            contextMenu.remove();
+        });
+
+    contextMenu.append('div')
+        .text('Delete Connected Links')
+        .on('click', () => {
+            deleteConnectedLinks(d.id);
+            contextMenu.remove();
+        });
+    
+    // Close menu when clicking outside
+    d3.select('body').on('click.context-menu', () => {
+        contextMenu.remove();
+    });
+}
+
+// Add function to delete connected links
+async function deleteConnectedLinks(nodeId) {
+    try {
+        const response = await fetch(`http://localhost:9080/api/nodes/${nodeId}/links`, {
+            method: 'DELETE'
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete links');
+        }
+
+        const data = await fetchNetworkData();
+        renderGraph(data);
+    } catch (error) {
+        console.error('Error deleting links:', error);
+        showError('Failed to delete links');
+    }
+}
+
+// Add these variables at the top of your file
+let isLinkMode = false;
+let selectedNode = null;
+
+// Add this function to handle mode switching
+function initializeModeSelector() {
+    const addNodeModeBtn = document.getElementById('addNodeMode');
+    const addLinkModeBtn = document.getElementById('addLinkMode');
+    const nodeButtons = document.getElementById('nodeButtons');
+
+    addNodeModeBtn.addEventListener('click', () => {
+        isLinkMode = false;
+        selectedNode = null;
+        addNodeModeBtn.classList.add('active');
+        addLinkModeBtn.classList.remove('active');
+        nodeButtons.style.display = 'flex';
+    });
+
+    addLinkModeBtn.addEventListener('click', () => {
+        isLinkMode = true;
+        selectedNode = null;
+        addLinkModeBtn.classList.add('active');
+        addNodeModeBtn.classList.remove('active');
+        nodeButtons.style.display = 'none';
+    });
+}
