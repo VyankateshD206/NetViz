@@ -7,9 +7,19 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div id="graph">
+    <div class="toolbar">
+        <div class="mode-selector">
+            <button id="addNodeMode" class="active">Add Nodes</button>
+            <button id="addLinkMode">Add Links</button>
+        </div>
+        <div id="nodeButtons">
+            <button onclick="addNewNode('router', window.innerWidth/2, window.innerHeight/2)">Add Router</button>
+            <button onclick="addNewNode('switch', window.innerWidth/2, window.innerHeight/2)">Add Switch</button>
+            <button onclick="addNewNode('device', window.innerWidth/2, window.innerHeight/2)">Add Device</button>
+        </div>
     </div>
-    <div id="error-message" style="display: none;"></div>
+    <div id="graph"></div>
+    <div id="error-message"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>
 </body>
