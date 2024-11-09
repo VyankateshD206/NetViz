@@ -2,86 +2,79 @@
 #include <vector>
 #include <queue>
 #include <unordered_map>
-#include <algorithm>
-#include "Device.h"
-#include "Network.h"
+#include <set>
+#include <cmath>
 
 using namespace std;
 
-// Node structure for A* algorithm
+// Define a device structure with MAC and other device information
+struct Device {
+    string mac;
+    string type;  // Type: router, switch, etc.
+    vector<Device*> neighbors;  // List of neighboring devices
+
+    Device(string macAddr, string devType) : mac(macAddr), type(devType) {}
+};
+
+// Define a Node structure for A* algorithm (for priority queue)
 struct Node {
-    device* dev; // Device object
-    double gCost; // Cost from start to this node
-    double hCost; // Heuristic cost to target
-    double fCost() const { return gCost + hCost; } // Total cost
-};
+    Device* device;
+    float g_cost; // Cost from start to current node
+    float h_cost; // Estimated cost to goal
+    float f_cost; // g_cost + h_cost
+    Node* parent; // To reconstruct the path
 
-// Compare nodes for priority queue
-struct NodeCompare {
-    bool operator()(Node* a, Node* b) {
-        return a->fCost() > b->fCost();
+    Node(Device* dev, float g, float h, Node* parentNode)
+        : device(dev), g_cost(g), h_cost(h), parent(parentNode) {
+            f_cost = g_cost + h_cost;
+    }
+
+    bool operator>(const Node& other) const {
+        return f_cost > other.f_cost;
     }
 };
 
-// A* algorithm implementation
-class AStarAlgorithm {
-public:
-    Network network; // Using the Network class
+// A* Search Algorithm
+vector<Device*> aStar(Device* start, Device* goal) {
+    // Priority queue to store nodes, ordered by f_cost
+    priority_queue<Node, vector<Node>, greater<Node>> openSet;
+    unordered_map<string, Node*> allNodes;  // To track nodes for quick access
+    set<Device*> closedSet;  // To track already visited nodes
 
-    vector<device*> aStar(device* start, device* goal) {
-        priority_queue<Node*, vector<Node*>, NodeCompare> openSet;
-        unordered_map<string, double> gScores;
-        unordered_map<string, device*> cameFrom;
+    openSet.push(Node(start, 0, 0, nullptr));
+    allNodes[start->mac] = &openSet.top();
 
-        // Initialize costs
-        gScores[start->mac] = 0.0;
-        openSet.push(new Node{start, 0.0, heuristic(start, goal)});
+    while (!openSet.empty()) {
+        Node* currentNode = &openSet.top();
+        openSet.pop();
 
-        while (!openSet.empty()) {
-            Node* current = openSet.top();
-            openSet.pop();
-
-            // If the goal is reached
-            if (current->dev->mac == goal->mac) {
-                vector<device*> path;
-                device* step = goal;
-                while (step != nullptr) {
-                    path.push_back(step);
-                    step = cameFrom[step->mac]; // Check if the key exists before dereferencing
-                }
-                reverse(path.begin(), path.end());
-                return path;
+        if (currentNode->device == goal) {
+            // Reconstruct the path
+            vector<Device*> path;
+            Node* pathNode = currentNode;
+            while (pathNode) {
+                path.push_back(pathNode->device);
+                pathNode = pathNode->parent;
             }
-
-            // Explore neighbors
-            for (const auto& neighborMac : network.getConnections().at(current->dev->mac)) {
-                double tentative_gScore = gScores[current->dev->mac] + 1.0; // Assuming uniform cost
-                if (gScores.find(neighborMac) == gScores.end() || tentative_gScore < gScores[neighborMac]) {
-                    cameFrom[neighborMac] = current->dev;
-                    gScores[neighborMac] = tentative_gScore;
-                    device* neighborDev = findDeviceByMac(neighborMac); // Find the device by MAC
-                    if (neighborDev) {
-                        openSet.push(new Node{neighborDev, tentative_gScore, heuristic(neighborDev, goal)});
-                    }
-                }
-            }
+            reverse(path.begin(), path.end());
+            return path;
         }
-        return {}; // Return empty path if no path is found
-    }
 
-    // Heuristic function (fixed for simplicity)
-    double heuristic(device* a, device* b) const { // Make const if it doesn't modify class state
-        return 1.0; // Replace with actual heuristic logic if needed
-    }
+        closedSet.insert(currentNode->device);
 
-    // Function to find a device by MAC address
-    device* findDeviceByMac(const string& mac) {
-        for (const auto& dev : network.getDevices()) {
-            if (dev.mac == mac) {
-                return &dev; // Return reference to the existing device
-            }
+        for (Device* neighbor : currentNode->device->neighbors) {
+            if (closedSet.count(neighbor)) continue;
+
+            float g_cost = currentNode->g_cost + 1;  // Assume a cost of 1 for each edge
+            float h_cost = abs(stoi(neighbor->mac.substr(9, 2)) - stoi(goal->mac.substr(9, 2)));  // A simple heuristic (difference in MAC addresses)
+
+            Node* neighborNode = new Node(neighbor, g_cost, h_cost, currentNode);
+            openSet.push(*neighborNode);
+            allNodes[neighbor->mac] = neighborNode;
         }
-        return nullptr; // Device not found
     }
-};
+
+    return {};  // Return empty path if no path found
+}
+
 
