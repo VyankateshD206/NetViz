@@ -1,6 +1,10 @@
 # NetViz: Computer Network Visualizer
 
-The **NetViz** is a C++ program designed to simulate the working of computer networks. It allows users to create their own custom network topologies using drag-and-drop components. The tool provides a visual representation of how data packets are transferred across a network, enabling users to explore the dynamics of computer networks in an interactive and engaging way.
+The **NetViz** is a C++ program designed to simulate the working of computer networks. It allows users to create their own custom network topologies using drag-and-drop components. The tool provides a visual representation of how data packets are transferred across a network, enabling users to explore the dynamics of computer networks in an interactive and engaging way.<br>
+
+![NetViz](https://github.com/user-attachments/assets/cb559dfa-3899-4d27-941b-5d79b969ad42)
+
+
 
 ## Features
 - **Custom Network Topologies**: Create custom networks using drag-and-drop components.
@@ -25,7 +29,7 @@ The **NetViz** is a C++ program designed to simulate the working of computer net
 
 1. Clone the repository to your local machine:
    ```bash
-   git clone https://github.com/your-username/computer-network-visualizer.git
+   git clone https://github.com/VyankateshD206/NetViz.git
    
 2. Pistache Installation for Backend:
    [Pistache Website](https://pistacheio.github.io/pistache/docs/)
