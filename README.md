@@ -3,6 +3,9 @@
 The **NetViz** is a C++ program designed to simulate the working of computer networks. It allows users to create their own custom network topologies using drag-and-drop components. The tool provides a visual representation of how data packets are transferred across a network, enabling users to explore the dynamics of computer networks in an interactive and engaging way.<br>
 
 ![NetViz](https://github.com/user-attachments/assets/cb559dfa-3899-4d27-941b-5d79b969ad42)
+![NetViz GIF](https://github.com/user-attachments/assets/340bd134-60bf-4266-b952-00e5d77ddb1e)
+
+
 
 
 
