@@ -3,42 +3,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NetViz - Network Visualization</title>
+    <title>Network Visualization</title>
     <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header class="app-header">
-        <h1>NetViz</h1>
-        <p class="subtitle">Network Visualization Tool</p>
-    </header>
-    
-    <div class="main-container">
-        <div class="toolbar">
-            <div class="mode-selector">
-                <button id="addNodeMode" class="mode-btn active">
-                    <span class="icon">📍</span> Add Nodes
-                </button>
-                <button id="addLinkMode" class="mode-btn">
-                    <span class="icon">🔗</span> Add Links
-                </button>
-            </div>
-            <div id="nodeButtons" class="node-actions">
-                <button class="action-btn router" onclick="addNewNode('router', window.innerWidth/2, window.innerHeight/2)">
-                    <span class="icon">🌐</span> Add Router
-                </button>
-                <button class="action-btn switch" onclick="addNewNode('switch', window.innerWidth/2, window.innerHeight/2)">
-                    <span class="icon">🔄</span> Add Switch
-                </button>
-                <button class="action-btn device" onclick="addNewNode('device', window.innerWidth/2, window.innerHeight/2)">
-                    <span class="icon">💻</span> Add Device
-                </button>
-            </div>
+    <div class="toolbar">
+        <div class="mode-selector">
+            <button id="addNodeMode" class="active">Add Nodes</button>
+            <button id="addLinkMode">Add Links</button>
         </div>
-        <div id="graph" class="graph-container"></div>
-        <div id="error-message" class="error-toast"></div>
+        <div id="nodeButtons">
+            <button onclick="addNewNode('router', window.innerWidth/2, window.innerHeight/2)">Add Router</button>
+            <button onclick="addNewNode('switch', window.innerWidth/2, window.innerHeight/2)">Add Switch</button>
+            <button onclick="addNewNode('device', window.innerWidth/2, window.innerHeight/2)">Add Device</button>
+        </div>
     </div>
-
+    <div id="graph"></div>
+    <div id="error-message"></div>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="script.js"></script>
 </body>
